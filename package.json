@@ -14,11 +14,7 @@
         {"type": "integer", "name": "panel_maxHeight",            "title": "Maximum Panel height", "value": 400,  "hidden": true},
         {"type": "bool",    "name": "panel_advancedStyle",        "title": "Advanced Panel style", "value": true, "hidden": true},
 
-        {"type": "string",  "name": "twitch_clientId",            "title": "Twitch Client ID", "value": "1owsrolvxz8khldqe6puadzd8bldq34", "hidden": true},
-        
-        {"type": "string",  "name": "twitchchannelList",          "title": "Twitch Channels",      "hidden": true},
-        {"type": "string",  "name": "twitchusernameList",         "title": "Twitch Users",         "hidden": true},
-        {"type": "bool",    "name": "autoUsername",               "title": "Auto detect username", "hidden": true}
+        {"type": "string",  "name": "twitch_clientId",            "title": "Twitch Client ID", "value": "1owsrolvxz8khldqe6puadzd8bldq34", "hidden": true}
     ],
     "icon64": "data/icon64.png",
     "homepage": "http://jtvn.humanoids.be/",
