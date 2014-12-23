@@ -1,6 +1,5 @@
 {
     "preferences": [
-        {"type": "control", "name": "manageChannels",             "title": "Manage Channels", "label": "Open Channels Manager"},
 	    {"type": "integer", "name": "updateInterval",             "title": "Update Interval", "description":"Interval of the addon checking wether a stream is live in seconds. When 0, the states aren't automatically updated.", "value": 20},
         {"type": "bool",    "name": "onlineNotification",         "title": "Show a notification when a stream goes online", "value": true},
         {"type": "bool",    "name": "titleChangeNotification",    "title": "Show a notification when a stream changes the title", "value": true},
@@ -29,12 +28,12 @@
         "manueljrs",
         "alan2loin"
     ],
-    "name": "justintv-stream-notifications",
-    "version": "3.0.0",
+    "name": "qubetubers-stream-notifications",
+    "version": "2.0.0",
     "lib": "lib",
-    "title": "Live Stream Notifier",
+    "title": "QubeTubers Stream Notifier",
     "main": "lib/main",
-    "id": "jid0-z2wAjbeFD5dTCgsj70eQ6UAqQl4@jetpack",
+    "id": "jid0-hHdFAF7Ok82XckpQDIaG4MKS0NQ@jetpack",
     "icon": "data/icon.png",
     "engines": {
         "firefox": ">=33.0a1"
