@@ -13,6 +13,9 @@ body {
     font-family: sans-serif;
     line-height: 1.2em;
     
+    background: #222;
+    color: #F1F1F1;
+    
     -moz-user-select: none;
     overflow-x: hidden;
 }
@@ -36,19 +39,22 @@ a {
 .tabstrip {
     padding: 0;
     margin: 0;
-    background: #2c24c5;
+    background: -moz-linear-gradient(center top , #333, #111) repeat scroll 0% 0% transparent;
+    box-shadow: 1px 1px 0px 0px #111 inset;
 }
 
 .tabstrip a:link, .tabstrip a:hover, .tabstrip a:active, .tabstrip a:visited,
 .toolbar a:link, .toolbar a:hover, .toolbar a:active, .toolbar a:visited {
-    color: white;
+    color: #F1F1F1;
     text-decoration: none;
     display: inline-block;
     padding:.5em;
+    box-sizing: border-box;
 }
 
 .tabstrip a.current, .toolbar a:hover, .toolbar a:active {
-    background: #497dfe;
+    background: #111;
+    border-bottom: 4px solid #5F0000;
 }
 
 .toolbar {
