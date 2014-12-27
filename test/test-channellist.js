@@ -129,7 +129,7 @@ exports['test channellist'] = function(assert, done) {
             list.addChannel(getChannel());
         },
         function testAddChannels(assert, next) {
-            //todo
+            //TODO
             next();
         },
         function testGetChannel(assert, next) {
@@ -240,8 +240,8 @@ exports['test channellist'] = function(assert, done) {
         },
         function testRemoveUsersByFavorite(assert, next) {
             list.getChannel(function(channel) {
-                list.once("userdeleted", function(userId) {
-                    assert.equal(userId, 1, "User has been deleted");
+                list.once("userdeleted", function(user) {
+                    assert.equal(user.id, 1, "User has been deleted");
                     next();
                 });
                 list.removeUsersWithFavorite(channel.id);
@@ -258,8 +258,8 @@ exports['test channellist'] = function(assert, done) {
         },
         function testRemoveUser(assert, next) {
             list.getUserId('test2', 'test', function(id) {
-                list.once("userdeleted", function(userId) {
-                    assert.equal(id, userId);
+                list.once("userdeleted", function(user) {
+                    assert.equal(id, user.id);
                     next();
                 });
                 list.removeUser(id);

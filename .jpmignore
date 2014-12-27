@@ -1,0 +1,15 @@
+*.xpi
+.*
+
+node_modules/
+
+# Python
+python-lib/
+*.pyc
+
+# Windows
+*Thumbs.db
+
+# Scratch
+*~
+

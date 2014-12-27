@@ -32,10 +32,7 @@ self.port.on("initdata", function(options){
 
     var providerDropdown = document.querySelector("#providerDropdown");
     for(var provider in providers) {
-        var option = document.createElement("option");
-        option.value = provider;
-        option.innerHTML = providers[provider].name;
-        providerDropdown.appendChild(option);
+        providerDropdown.add(new Option(providers[provider].name, provider));
     }
 
     options.channels.forEach(function(channel) {
@@ -79,6 +76,7 @@ if(document.querySelector(".tabbed a.current") && document.querySelector(".tabbe
 }
 else
     checkUser();
+updateSelect();
     
 document.addEventListener("keypress", function(evt) {
     if(!popup.querySelector("dialog").hasAttribute("open")) {
@@ -111,11 +109,13 @@ document.querySelector("main.tabbed").addEventListener("tabchanged", function(ev
         document.querySelector(".toolbar").setAttribute("aria-controls", "users");
         checkUser();
     }
+    updateSelect();
 });
 
 document.querySelector("#autoAdd").addEventListener("click", function(evt) {
     for(var provider in providers) {
-        self.port.emit("autoadd", provider);
+        if(provider.supports.credentials)
+            self.port.emit("autoadd", provider);
     }
 });
 
@@ -192,6 +192,33 @@ function hideDialog() {
 function resetDialogForms() {
     popup.querySelector("#channelNameField").value = "";
 }
+
+function showOptions() {
+    var options = document.querySelector("#providerDropdown").options;
+    for(var i = 0; i < options.length; ++i) {
+        options[i].disabled = false;
+    }
+}
+
+function hideOptions() {
+    var options = document.querySelector("#providerDropdown").options;
+    for(var i = 0; i < options.length; ++i) {
+        if(!providers[options[i].value].supports.favorites) {
+            options[i].disabled = true;
+            options[i].selected = false;
+        }
+    }
+}
+
+function updateSelect() {
+    if(popup.querySelector("#channelRadio").checked)
+        showOptions();
+    else
+        hideOptions();
+}
+
+document.querySelector("#channelRadio").addEventListener("change", updateSelect);
+document.querySelector("#userRadio").addEventListener("change", updateSelect);
 
 popup.querySelector("input[type='button']").addEventListener("click", function(evt) {
     hideDialog();
