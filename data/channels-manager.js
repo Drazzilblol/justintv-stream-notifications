@@ -114,7 +114,7 @@ document.querySelector("main.tabbed").addEventListener("tabchanged", function(ev
 
 document.querySelector("#autoAdd").addEventListener("click", function(evt) {
     for(var provider in providers) {
-        if(provider.supports.credentials)
+        if(providers[provider].supports.credentials)
             self.port.emit("autoadd", provider);
     }
 });
@@ -246,19 +246,25 @@ popup.querySelector("form").addEventListener("submit", function(evt) {
 });
 
 function getBestImageForSize(user, size) {
+    size = parseInt(size, 10);
     // shortcut if there's an image with the size demanded
     if(user.image.hasOwnProperty(size.toString())) {
         return user.image[size];
     }
     
     // search next biggest image
-    var index = Number.MAX_VALUE;
+    var index = Number.MAX_VALUE, biggest = 0;
     Object.keys(user.image).forEach(function(s) {
         s = parseInt(s, 10);
-        if(s > size && s < index) {
+        if(s > size && s < index)
             index = s;
-        }
+        if(s > biggest)
+            biggest = s;
     });
+
+    if(index > biggest)
+        index = biggest;
+    
     return user.image[index];
 }
 
@@ -269,7 +275,7 @@ function addChannel(channel) {
             small       = document.createElement("small"),
             span        = document.createElement("span"),
             title       = document.createTextNode(channel.uname),
-            type        = document.createTextNode(channel.type);
+            type        = document.createTextNode(providers[channel.type].name);
         image.src       = getBestImageForSize(channel, 50);
         channelNode.id  = "channel"+channel.id;
         small.appendChild(type);
@@ -288,7 +294,7 @@ function addUser(user) {
             small    = document.createElement("small"),
             span     = document.createElement("span"),
             title    = document.createTextNode(user.uname),
-            type     = document.createTextNode(user.type);
+            type     = document.createTextNode(providers[user.type].name);
         image.src    = getBestImageForSize(user, 50);
         userNode.id  = "user"+user.id;
         small.appendChild(type);
