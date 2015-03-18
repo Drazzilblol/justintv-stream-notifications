@@ -1,48 +1,132 @@
 {
-    "preferences": [
-	    {"type": "integer", "name": "updateInterval",             "title": "Update Interval", "description":"Interval of the addon checking wether a stream is live in seconds. When 0, the states aren't automatically updated.", "value": 20},
-        {"type": "bool",    "name": "onlineNotification",         "title": "Show a notification when a stream goes online", "value": true},
-        {"type": "bool",    "name": "titleChangeNotification",    "title": "Show a notification when a stream changes the title", "value": true},
-        {"type": "bool",    "name": "offlineNotification",        "title": "Show a notification when a stream goes offline", "value": false},
-        {"type": "radio",   "name": "panel_style",                "title": "Panel item display style", "value":1, "options": [{"value":"0", "label":"Minimal"}, {"value":"1", "label":"Normal"}, {"value":"2", "label":"Big Thumbnail"}]},
-        {"type": "bool",    "name": "updateTab",                  "title": "Open a tab with update info after an update", "description":"A tab with informations about new features is opened when the extension is updated.", "value": true},
-
-        {"type": "integer", "name": "queue_ratio",                "title": "Queue Request Treshhold", "value": 2, "hidden": true},
-        {"type": "integer", "name": "queue_maxRequestBatchSize",  "title": "Max Requests per Batch",  "value": 8, "hidden": true},
-
-        {"type": "integer", "name": "panel_minWidth",             "title": "Minimum Panel width",  "value": 320,  "hidden": true},
-        {"type": "integer", "name": "panel_maxHeight",            "title": "Maximum Panel height", "value": 400,  "hidden": true},
-
-        {"type": "string",  "name": "twitch_clientId",            "title": "Twitch Client ID", "value": "1owsrolvxz8khldqe6puadzd8bldq34", "hidden": true}
-    ],
-    "icon64": "data/icon64.png",
-    "homepage": "http://qubetubers.com/",
-    "description": "This displays a notification when a channel on twitch goes live. The currently live channels can also be checked in a panel. Which channels are checked for being live is fully customizable.",
-    "author": "freaktechnik",
-    "translators": [
-        "manueljrs",
-        "alan2loin"
-    ],
-    "name": "qubetubers-stream-notifications",
-    "version": "2.0.0",
-    "lib": "lib",
-    "title": "QubeTubers Stream Notifier",
-    "main": "lib/main",
-    "id": "jid0-hHdFAF7Ok82XckpQDIaG4MKS0NQ@jetpack",
-    "icon": "data/icon.png",
-    "engines": {
-        "firefox": ">=33.0a1"
+  "preferences": [
+    {
+      "type": "integer",
+      "name": "updateInterval",
+      "title": "Update Interval",
+      "description": "Interval of the addon checking wether a stream is live in seconds. When 0, the states aren't automatically updated.",
+      "value": 20
     },
-    "license": "MPL 2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/freaktechnik/justintv-stream-notifications.git"
+    {
+      "type": "bool",
+      "name": "onlineNotification",
+      "title": "Show a notification when a stream goes online",
+      "value": true
     },
-    "devDependencies": {
-        "jpm": "*"
+    {
+      "type": "bool",
+      "name": "titleChangeNotification",
+      "title": "Show a notification when a stream changes the title",
+      "value": true
     },
-    "scripts": {
-        "test": "jpm test -v",
-        "preinstall": "jpm xpi"
+    {
+      "type": "bool",
+      "name": "offlineNotification",
+      "title": "Show a notification when a stream goes offline",
+      "value": false
+    },
+    {
+      "type": "radio",
+      "name": "panel_style",
+      "title": "Panel item display style",
+      "value": 1,
+      "options": [
+        {
+          "value": "0",
+          "label": "Minimal"
+        },
+        {
+          "value": "1",
+          "label": "Normal"
+        },
+        {
+          "value": "2",
+          "label": "Big Thumbnail"
+        }
+      ]
+    },
+    {
+      "type": "bool",
+      "name": "panel_extras",
+      "title": "Extra info in panel",
+      "description": "Displays the viewer count and the category name of a channel in the panel when availble.",
+      "value": false
+    },
+    {
+      "type": "integer",
+      "name": "queue_ratio",
+      "title": "Queue Request Treshhold",
+      "value": 2,
+      "hidden": true
+    },
+    {
+      "type": "integer",
+      "name": "queue_maxRequestBatchSize",
+      "title": "Max Requests per Batch",
+      "value": 8,
+      "hidden": true
+    },
+    {
+      "type": "integer",
+      "name": "panel_minWidth",
+      "title": "Minimum Panel width",
+      "value": 320,
+      "hidden": true
+    },
+    {
+      "type": "integer",
+      "name": "panel_maxHeight",
+      "title": "Maximum Panel height",
+      "value": 400,
+      "hidden": true
+    },
+    {
+      "type": "string",
+      "name": "twitch_clientId",
+      "title": "Twitch Client ID",
+      "value": "1owsrolvxz8khldqe6puadzd8bldq34",
+      "hidden": true
+    },
+    {
+      "type": "integer",
+      "name": "channellist_cacheTime",
+      "title": "Time to cache channel states while Firefox is closed",
+      "value": 600000,
+      "hidden": true
     }
+  ],
+  "icon64": "data/icon64.png",
+  "homepage": "http://qubetubers.com",
+  "description": "This displays a notification when a channel on twitch goes live. The currently live channels can also be checked in a panel. Which channels are checked for being live is fully customizable.",
+  "author": "freaktechnik",
+  "translators": [
+    "manueljrs",
+    "alan2loin"
+  ],
+  "name": "qubetubers-stream-notifications",
+  "version": "3.0.0",
+  "lib": "lib",
+  "title": "QubeTubers Stream Notifier",
+  "main": "lib/main",
+  "id": "jid0-hHdFAF7Ok82XckpQDIaG4MKS0NQ@jetpack",
+  "icon": "data/icon.png",
+  "engines": {
+    "firefox": ">=33.0a1",
+    "fennec": ">=30.0a1"
+  },
+  "license": "MPL 2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/freaktechnik/justintv-stream-notifications.git"
+  },
+  "dependencies": {
+    "jetpack-homepanel": "^1.0.1"
+  },
+  "devDependencies": {
+    "jpm": "*"
+  },
+  "scripts": {
+    "test": "jpm test -v",
+    "preinstall": "jpm xpi"
+  }
 }

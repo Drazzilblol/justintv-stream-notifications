@@ -71,7 +71,7 @@ function checkUser() {
 }
 
 if(document.querySelector(".tabbed a.current") && document.querySelector(".tabbed a.current").dataset.tab == 1) {
-    hide(document.querySelector("#autoAdd"));
+    hide(document.querySelector("#autoAdd").parentNode);
     checkChannel();
 }
 else
@@ -88,24 +88,31 @@ document.addEventListener("keypress", function(evt) {
             else
                 list = users;
                 
-            for(var i = 0; i < list.options.length; ++i) {
-                list.item(i).setAttribute("selected", true);
+            var items = list.querySelectorAll("option:not(.hidden)");
+            for(var i = 0; i < items.length; ++i) {
+                items[i].selected = true;
             }
         }
         else if(evt.key == "Del") {
             removeSelectedItems();
         }
+        else if(evt.key == "f" && evt.ctrlKey) {
+            document.querySelector("#searchField").select();
+        }
+        else if(evt.key == "w" && evt.ctrlKey) {
+            self.port.emit("close");
+        }
     }
-});
+}, true);
 
 document.querySelector("main.tabbed").addEventListener("tabchanged", function(evt) {
     if(evt.detail == 1) {
-        hide(document.querySelector("#autoAdd"));
+        hide(document.querySelector("#autoAdd").parentNode);
         document.querySelector(".toolbar").setAttribute("aria-controls", "channels");
         checkChannel();
     }
     else if(evt.detail == 2) {
-        show(document.querySelector("#autoAdd"));
+        show(document.querySelector("#autoAdd").parentNode);
         document.querySelector(".toolbar").setAttribute("aria-controls", "users");
         checkUser();
     }
@@ -246,7 +253,7 @@ popup.querySelector("form").addEventListener("submit", function(evt) {
 });
 
 function getBestImageForSize(user, size) {
-    size = parseInt(size, 10);
+    size = Math.round(parseInt(size, 10) * window.devicePixelRatio);
     // shortcut if there's an image with the size demanded
     if(user.image.hasOwnProperty(size.toString())) {
         return user.image[size];
@@ -268,7 +275,28 @@ function getBestImageForSize(user, size) {
     return user.image[index];
 }
 
+var filters = [
+                {
+                    subtarget: "span"
+                },
+                {
+                    subtarget: "small"
+                }
+            ];
+
 function addChannel(channel) {
+    /*
+        DOM structure:
+        <option id="channelId">
+            <img src="">
+            <span>
+                Username
+            </span>
+            <small>
+                Type
+            </small>
+        </option>
+    */
     if(!hasChannel(channel.id)) {
         var channelNode = document.createElement("option"),
             image       = new Image(),
@@ -284,6 +312,8 @@ function addChannel(channel) {
         channelNode.appendChild(span);
         channelNode.appendChild(small);
         channels.appendChild(channelNode);
+        var evObj = new CustomEvent("itemadded", { detail: channelNode });
+        channels.dispatchEvent(evObj);
     }
 }
 
@@ -303,6 +333,8 @@ function addUser(user) {
         userNode.appendChild(span);
         userNode.appendChild(small);
         users.appendChild(userNode);
+        var evObj = new CustomEvent("itemadded", { detail: userNode });
+        users.dispatchEvent(evObj);
     }
 }
 

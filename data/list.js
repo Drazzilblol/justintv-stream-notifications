@@ -6,11 +6,29 @@
 var live, offline, currentMenuTarget, currentStyle;
 const CHANNEL_ID_PREFIX = "channel";
 const CONTEXTMENU_ID    = "context";
+const filters = [
+    {
+        attribute: "class"
+    },
+    {
+        subtarget: ".name"
+    },
+    {
+        subtarget: ".title"
+    },
+    {
+        subtarget: ".viewers"
+    },
+    {
+        subtarget: ".category"
+    }
+];
 
 window.addEventListener("load", function() {
     live    = document.getElementById("live");
     offline = document.getElementById("offline");
     setStyle(addon.options.style);
+    setExtrasVisibility(addon.options.extras);
     resize();
     document.getElementById("configure").addEventListener("click", function(e) {
         e.preventDefault();
@@ -34,11 +52,35 @@ window.addEventListener("load", function() {
     document.querySelector(".tabbed").addEventListener("tabchanged", function() {
         resize();
     });
+    
+    var field = document.querySelector("#searchField");
+    document.querySelector("#searchButton").addEventListener("click", function() {
+        if(field.classList.contains("hidden")) {
+            show(field);
+            field.focus();
+        }
+        else {
+            hide(field);
+            field.value = "";
+            filter(field.value, live, filters);
+            filter(field.value, offline, filters);
+        }
+        resize();
+    });
+    field.addEventListener("keydown", function(e) {
+        filter(field.value, live, filters);
+        filter(field.value, offline, filters);
+        resize();
+    });
  });
 
 // Set up port commmunication listeners
 addon.port.on("setStyle", function(style) {
     setStyle(style);
+});
+
+addon.port.on("setExtras", function(visible) {
+    setExtrasVisibility(visible);
 });
 
 addon.port.on("addChannels", function(channels) {
@@ -93,6 +135,13 @@ function setStyle(style) {
     resize();
 }
 
+function setExtrasVisibility(visible) {
+    if(visible)
+        live.classList.add("extras");
+    else
+        live.classList.remove("extras");
+}
+
 // Find the node to inser before in order to keep the list sorted
 function findInsertionNodeIn(list, name) {
     var node = list.firstElementChild;
@@ -113,19 +162,25 @@ function insertChannel(channel, node) {
 }
 
 function getBestImageForSize(user, size) {
+    size = Math.round(parseInt(size, 10) * window.devicePixelRatio);
     // shortcut if there's an image with the size demanded
     if(user.image.hasOwnProperty(size.toString())) {
         return user.image[size];
     }
     
     // search next biggest image
-    var index = Number.MAX_VALUE;
+    var index = Number.MAX_VALUE, biggest = 0;
     Object.keys(user.image).forEach(function(s) {
         s = parseInt(s, 10);
-        if(s > size && s < index) {
+        if(s > size && s < index)
             index = s;
-        }
+        if(s > biggest)
+            biggest = s;
     });
+
+    if(index > biggest)
+        index = biggest;
+    
     return user.image[index];
 }
 
@@ -138,6 +193,14 @@ function addChannel(channel) {
                 <img src="avatar">
                 <span class="name">ChannelName</span><br>
                 <span class="title">ChannelTitle</span>
+                <aside>
+                    <span class="viewersWrapper">
+                        <span class="icon">v</span>&nbsp;<span class="viewers">0</span>
+                    </span>&nbsp;
+                    <span class="categoryWrapper">
+                        <span class="icon">c</span>&nbsp;<span class="category">Category</span>
+                    </span>
+                </aside>
             </div>
         </a>
     </li>
@@ -151,7 +214,14 @@ function addChannel(channel) {
         titleSpan     = document.createElement("span"),
         avatar        = new Image(),
         thumbnail     = new Image(),
-        wrapper       = document.createElement("div");
+        wrapper       = document.createElement("div"),
+        extra         = document.createElement("aside"),
+        viewersWrapper = document.createElement("span"),
+        viewersIcon   = document.createElement("span"),
+        viewers       = document.createElement("span"),
+        categoryWrapper = document.createElement("span"),
+        categoryIcon  = document.createElement("span"),
+        category      = document.createElement("span");
     avatar.src        = getBestImageForSize(channel, 30);
     thumbnail.src     = channel.thumbnail;
     spanName.appendChild(name);
@@ -162,6 +232,33 @@ function addChannel(channel) {
     wrapper.appendChild(spanName);
     wrapper.appendChild(br);
     wrapper.appendChild(titleSpan);
+
+    viewersWrapper.classList.add("viewersWrapper");
+    if(!channel.viewers && channel.viewers != 0)
+        viewersWrapper.classList.add("hidden");
+    viewersIcon.appendChild(document.createTextNode("v"));
+    viewersIcon.classList.add("icon");
+    viewersWrapper.appendChild(viewersIcon);
+    viewersWrapper.appendChild(document.createTextNode("\u00a0")); // &nbsp;
+    viewers.classList.add("viewers");
+    viewers.appendChild(document.createTextNode(channel.viewers));
+    viewersWrapper.appendChild(viewers);
+    extra.appendChild(viewersWrapper);
+    extra.appendChild(document.createTextNode(" "));
+    categoryWrapper.classList.add("categoryWrapper");
+    if(!channel.category)
+        categoryWrapper.classList.add("hidden");
+    categoryIcon.appendChild(document.createTextNode("c"));
+    categoryIcon.classList.add("icon");
+    categoryWrapper.appendChild(categoryIcon);
+    categoryWrapper.appendChild(document.createTextNode("\u00a0"));
+    category.classList.add("category");
+    category.appendChild(document.createTextNode(channel.category));
+    categoryWrapper.appendChild(category);
+    extra.appendChild(categoryWrapper);
+
+    wrapper.appendChild(extra);
+
     link.appendChild(thumbnail);
     link.appendChild(wrapper);
     link.setAttribute("contextmenu", CONTEXTMENU_ID);
@@ -173,6 +270,12 @@ function addChannel(channel) {
     channelNode.classList.add(channel.type);
     channelNode.appendChild(link);
     channelNode.id = CHANNEL_ID_PREFIX+channel.id;
+    
+    // hide the channel by if it's filtered out atm
+    console.log(document.querySelector("#searchField").value);
+    if(!matches(channelNode, document.querySelector("#searchField").value, filters))
+        hide(channelNode);
+    
     insertChannel(channel, channelNode);
     hideNoChannels();
     if(channel.live)
@@ -181,7 +284,7 @@ function addChannel(channel) {
 
 function removeChannel(channelId) {
     var channelNode = document.getElementById(CHANNEL_ID_PREFIX+channelId);
-    if(channelNode.parentNode.id = "live" && live.childElementCount < 2) {
+    if("live" == channelNode.parentNode.id && live.childElementCount < 2) {
         displayNoOnline();
         addon.port.emit("offline");
     }
@@ -195,9 +298,24 @@ function removeChannel(channelId) {
 function updateNodeContent(channel) {
     var channelNode = document.getElementById(CHANNEL_ID_PREFIX+channel.id),
         titleNode = channelNode.querySelector(".title"),
-        titleText = document.createTextNode(channel.title);
+        titleText = document.createTextNode(channel.title),
+        viewers = channelNode.querySelector(".viewers"),
+        category = channelNode.querySelector(".category");
     titleNode.replaceChild(titleText, titleNode.firstChild);
-    channelNode.querySelector("a>img").src = channel.thumbnail;
+    
+    viewers.replaceChild(document.createTextNode(channel.viewers), viewers.firstChild);
+    if(!channel.viewers && channel.viewers != 0)
+        channelNode.querySelector(".viewersWrapper").classList.add("hidden");
+    else
+        channelNode.querySelector(".viewersWrapper").classList.remove("hidden");
+    category.replaceChild(document.createTextNode(channel.category), category.firstChild);
+    if(!channel.category)
+        channelNode.querySelector(".categoryWrapper").classList.add("hidden");
+    else
+        channelNode.querySelector(".categoryWrapper").classList.remove("hidden");
+
+    channelNode.querySelector("a>img").setAttribute("src", channel.thumbnail+"?timestamp="+Date.now());
+    channelNode.querySelector("a div img").setAttribute("src", getBestImageForSize(channel, 30));
 }
 
 function makeChannelLive(channel) {

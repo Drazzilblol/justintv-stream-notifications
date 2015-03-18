@@ -128,6 +128,19 @@ exports['test channellist'] = function(assert, done) {
             });
             list.addChannel(getChannel());
         },
+        function testAddSingleChannelAsChannels(assert, next) {
+            list.once("channelsadded", function(channels) {
+                assert.equal(channels.length, 1);
+                assert.ok(channels[0] instanceof Channel, "Channel is a channel");
+                assert.ok(channels[0].id, "The channel has an ID");
+                assert.equal(channels[0].uname, "lorem ipsum");
+                list.removeChannel(channels[0].id);
+                next();
+            });
+            var ch = getChannel();
+            ch.login = "temp_chan";
+            list.addChannels(ch);
+        },
         function testAddChannels(assert, next) {
             //TODO
             next();
@@ -196,7 +209,7 @@ exports['test channellist'] = function(assert, done) {
         function testSetNewChannel(assert, next) {
             var newChannel = getChannel();
             newChannel.login = 'test_chan2';
-            newChannel.id = 2;
+            newChannel.id = 3;
             newChannel.live = true;
 
             list.once("channelupdated", function(channel) {
