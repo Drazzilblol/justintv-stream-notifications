@@ -30,10 +30,6 @@ window.addEventListener("load", function() {
     setStyle(addon.options.style);
     setExtrasVisibility(addon.options.extras);
     resize();
-    document.getElementById("configure").addEventListener("click", function(e) {
-        e.preventDefault();
-        addon.port.emit("configure");
-    });
     document.getElementById("refreshButton").addEventListener("click", function(e) {
         e.preventDefault();
         addon.port.emit("refresh");
@@ -67,7 +63,7 @@ window.addEventListener("load", function() {
         }
         resize();
     });
-    field.addEventListener("keydown", function(e) {
+    field.addEventListener("keyup", function(e) {
         filter(field.value, live, filters);
         filter(field.value, offline, filters);
         resize();
